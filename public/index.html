@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friends pane</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+  <label for="username">Name:</label>
+  <input type="text" id="username" name="username" /><br>
+  <button onclick="triggerActive()">Become active</button>
+
+  <div class="friends-list-wrapper"></div>
+</body>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  function getUserAndFriendsList() {
+    const userAndFriendsList = {
+      socketRoom: 1110,
+      friendsList: [
+        { username: "name1", socketRoom: 1110 },
+        { username: "name2", socketRoom: 1111 },
+        { username: "name3", socketRoom: 1112 },
+        { username: "name4", socketRoom: 1113 }
+      ]
+    }
+    return userAndFriendsList;
+  }
+
+  (function () {
+    const userAndFriendsList = getUserAndFriendsList();
+    socket.emit("user_connected", userAndFriendsList);
+  })();
+
+  function triggerActive() {
+    const username = $('#username').val();
+    socket.emit("validateUser", username);
+  }
+
+  // friendsList is an array of objects of this form: { username: <string>, socketRoom: <uuid>, status: <string> }
+  socket.on("friends_status", (friendsList) => {
+    console.log('friends_status')
+    friendsList.forEach(friend => {
+      $(".friends-list-wrapper")
+        .append(`
+        <div class="user-row" id="user__${friend.socketRoom}">
+          <span class="user-username" >Name: ${friend.username}</span>,
+          <span class="user-status" >Status: ${friend.status}</span>
+        </div>
+        `);
+    })
+  })
+
+  // userSocketRoom is an variable of type uuid
+  // triggered when an user connects or disconnects   
+  socket.on("update_user_status", (userSocketRoom, status) => {
+    console.log('update_user_status')
+    console.log('userSocketRoom:', userSocketRoom, 'status:', status)
+    if (userSocketRoom) {
+      $(`#${userSocketRoom} .user-status`).text(`Status: ${status}`)
+    }
+  });
+
+</script>
+
+</html>
