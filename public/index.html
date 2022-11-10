@@ -14,7 +14,6 @@
 <body>
   <label for="username">Name:</label>
   <input type="text" id="username" name="username" /><br>
-  <button onclick="triggerActive()">Become active</button>
 
   <div class="friends-list-wrapper"></div>
 </body>
@@ -25,31 +24,59 @@
   const socket = io();
 
   function getUserAndFriendsList() {
-    const userAndFriendsList = {
-      socketRoom: 1110,
-      friendsList: [
-        { username: "name1", socketRoom: 1110 },
-        { username: "name2", socketRoom: 1111 },
-        { username: "name3", socketRoom: 1112 },
-        { username: "name4", socketRoom: 1113 }
-      ]
-    }
+    const inputOptions = [
+      userAndFriendsList0 = {
+        socketRoom: 1110,
+        friendsList: [
+          { username: "name1", socketRoom: 1111 },
+          { username: "name2", socketRoom: 1112 },
+          { username: "name3", socketRoom: 1113 }
+        ]
+      },
+      userAndFriendsList1 = {
+        socketRoom: 1111,
+        friendsList: [
+          { username: "name0", socketRoom: 1110 },
+          { username: "name2", socketRoom: 1112 },
+          { username: "name3", socketRoom: 1113 }
+        ]
+      },
+      userAndFriendsList2 = {
+        socketRoom: 1112,
+        friendsList: [
+          { username: "name0", socketRoom: 1110 },
+          { username: "name1", socketRoom: 1111 },
+          { username: "name4", socketRoom: 1114 }
+        ]
+      },
+      userAndFriendsList3 = {
+        socketRoom: 1113,
+        friendsList: [
+          { username: "name0", socketRoom: 1110 },
+          { username: "name1", socketRoom: 1111 },
+          { username: "name4", socketRoom: 1114 }
+        ]
+      }
+    ];
+    
+    const userAndFriendsList = inputOptions[Math.floor(Math.random() * 4)];
+
+    console.log(userAndFriendsList)
+    $(".friends-list-wrapper")
+      .append(`
+      <div>${userAndFriendsList.socketRoom}</div>`);
     return userAndFriendsList;
   }
 
   (function () {
     const userAndFriendsList = getUserAndFriendsList();
-    socket.emit("user_connected", userAndFriendsList);
+    if (userAndFriendsList) {
+      socket.emit("user_connected", userAndFriendsList);
+    }
   })();
-
-  function triggerActive() {
-    const username = $('#username').val();
-    socket.emit("validateUser", username);
-  }
 
   // friendsList is an array of objects of this form: { username: <string>, socketRoom: <uuid>, status: <string> }
   socket.on("friends_status", (friendsList) => {
-    console.log('friends_status')
     friendsList.forEach(friend => {
       $(".friends-list-wrapper")
         .append(`
@@ -64,8 +91,6 @@
   // userSocketRoom is an variable of type uuid
   // triggered when an user connects or disconnects   
   socket.on("update_user_status", (userSocketRoom, status) => {
-    console.log('update_user_status')
-    console.log('userSocketRoom:', userSocketRoom, 'status:', status)
     if (userSocketRoom) {
       $(`#${userSocketRoom} .user-status`).text(`Status: ${status}`)
     }
