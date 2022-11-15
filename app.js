@@ -25,7 +25,9 @@ function getFriendsStatusAndNotifyFriends(USER_SOCKET_ROOM, FRIENDS_LIST) {
 
     // if the friend's room exists it means the friend is online
     const friendRoom = io.sockets.adapter.rooms.get(friendSocketRoom);
-    if (friendRoom) {
+    if (friend.username == null) {
+      friend.status = 'not registered';
+    } else if (friendRoom) {
       // emit to friend that user is on
       io.to(friendSocketRoom).emit("update_user_status", USER_SOCKET_ROOM, 'on');
 

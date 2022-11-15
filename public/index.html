@@ -56,10 +56,18 @@
           { username: "name1", socketRoom: 1111 },
           { username: "name4", socketRoom: 1114 }
         ]
+      },
+      userAndFriendsList4 = {
+        socketRoom: 1114,
+        friendsList: [
+          { username: "name3", socketRoom: 1113 },
+          { username: "name2", socketRoom: 1112 },
+          { username: null, socketRoom: null }
+        ]
       }
     ];
     
-    const userAndFriendsList = inputOptions[Math.floor(Math.random() * 4)];
+    const userAndFriendsList = inputOptions[Math.floor(Math.random() * 5)];
 
     console.log(userAndFriendsList)
     $(".friends-list-wrapper")
